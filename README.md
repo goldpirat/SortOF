@@ -36,8 +36,8 @@ This Python library provides a comprehensive toolset for students studying algor
 1.  Clone the repository:
 
     ```bash
-    git clone [repository URL]
-    cd [repository directory]
+    git clone git@github.com:goldpirat/SortOF.git
+    cd SortOF
     ```
 
 2.  Create a virtual environment (recommended):
