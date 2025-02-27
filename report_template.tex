@@ -1,0 +1,40 @@
+\documentclass{article}
+\usepackage{geometry}
+\geometry{a4paper, margin=1in}
+\usepackage{graphicx} % For including images
+\usepackage{amsmath}  % For math formulas (if needed later)
+\usepackage{amsfonts} % For math fonts (if needed later)
+\usepackage{amssymb}  % For math symbols (if needed later)
+\usepackage{hyperref} % For hyperlinks (optional)
+
+\title{\textbf{\LaTeX Benchmark Report: \algorithmName}}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\section*{Algorithm Details}
+\begin{itemize}
+    \item \textbf{Algorithm Name:} \algorithmName
+    \item \textbf{Data Type:} \dataType
+    \item \textbf{Input Description:} \inputDescription
+    \item \textbf{Sorting Order:} \order
+    \item \textbf{Test Cases:} \testCases
+    \ifthenelse{\equal{\heapifyTimeIncluded}{Yes}}{%
+        \item \textbf{Heapify Time Included:} Yes
+    }{}
+\end{itemize}
+
+\section*{Benchmark Results}
+\begin{itemize}
+    \item \textbf{Average Time:} \averageTime seconds
+\end{itemize}
+
+\section*{Algorithm Description}
+\description
+
+\section*{Data Visualization}
+% Placeholder for data visualization - image will be inserted here
+\includegraphics[width=\textwidth]{visualization_placeholder.png} % Replace with actual image path later
+
+\end{document}

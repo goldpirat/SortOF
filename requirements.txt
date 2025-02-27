@@ -1,1 +1,2 @@
-fpdf2
+pylatex
+matplotlib

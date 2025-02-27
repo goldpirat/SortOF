@@ -1,366 +1,18 @@
+# sorting_algorithms.py
 import time
 import random
 import string
-from report_generator import generate_pdf_report
+import math  # for floor in heapify
+from report_generator import generate_pdf_report # Changed import to generate_latex_report
 
-
-def _compare(x, y, method):
-    if method == 'length':
-        return len(x) <= len(y)
-    elif method == 'lex':
-        return x <= y
-    else:
-        raise ValueError("Method not recognized. Use 'length' or 'lex'.")
-
-
-def bubble_sort(arr):
-    """
-    Sorts the array using bubble sort.
-    Returns the sorted array.
-    """
-    n = len(arr)
-    for i in range(n):
-        for j in range(0, n - i - 1):
-            if arr[j] > arr[j+1]:
-                arr[j], arr[j+1] = arr[j+1], arr[j]
-    return arr
-
-def bubble_sort_num(*, testcase, order, pdf, unsorted_array=None, min_val=None, max_val=None, select=None):
-    """
-    Sorts numbers using the bubble sort algorithm.
-
-    Parameters:
-      - testcase (int): Number of test cases (if unsorted_array is not provided).
-      - order (str): 'normal' for ascending or 'reverse' for descending order.
-      - pdf (bool): Whether to generate a PDF report.
-      - unsorted_array (list, optional): A user-supplied array of numbers.
-      - min_val (int, optional): Minimum value for random generation (required if unsorted_array is not provided).
-      - max_val (int, optional): Maximum value for random generation (required if unsorted_array is not provided).
-      - select (int, optional): Size of the array for random generation (required if unsorted_array is not provided).
-
-    Returns:
-      - sorted_result (list): The sorted array from the final test case.
-      - average_time (float): The average time taken to sort.
-    """
-    # Use provided array if available; otherwise generate random arrays.
-    if unsorted_array is not None:
-        arrays = [unsorted_array]
-        actual_testcase = 1
-    else:
-        if None in (min_val, max_val, select):
-            raise ValueError("For random array generation, you must provide min_val, max_val, and select.")
-        arrays = [
-            [random.randint(min_val, max_val) for _ in range(select)]
-            for _ in range(testcase)
-        ]
-        actual_testcase = testcase
-
-    total_time = 0
-    sorted_result = None
-
-    # Run bubble sort on each test case.
-    for arr in arrays:
-        arr_copy = arr.copy()  # work on a copy to keep the original intact
-        start = time.perf_counter()
-        sorted_arr = bubble_sort(arr_copy)
-        end = time.perf_counter()
-
-        # Adjust the order if needed.
-        if order.lower() == 'reverse':
-            sorted_arr = list(reversed(sorted_arr))
-
-        total_time += (end - start)
-        sorted_result = sorted_arr  # store the result from the last test case
-
-    average_time = total_time / actual_testcase
-
-    # Generate PDF report if requested.
-    if pdf:
-        description = (
-            "Bubble Sort is a simple comparison-based algorithm.\n"
-            "Worst-case and average-case time complexity: O(n²).\n"
-            "Best-case (when the array is nearly sorted): O(n).\n"
-            "It works by repeatedly swapping adjacent elements if they are in the wrong order."
-        )
-        generate_pdf_report("Bubble Sort (Numbers)", average_time, description, output_filename="bubble_sort_report.pdf")
-
-    return sorted_result, average_time
-
-
+# --- Helper Functions ---
 def generate_random_word(min_length, max_length):
-    """
-    Generates a random word with length between min_length and max_length.
-    """
+    """Generates a random word with length between min_length and max_length."""
     length = random.randint(min_length, max_length)
     return ''.join(random.choices(string.ascii_lowercase, k=length))
 
-
-def bubble_sort_words(*, testcase, order, pdf, unsorted_array=None, min_length=3, max_length=10, select=10, method='length'):
-    """
-    Sorts words using the bubble sort algorithm.
-    
-    Parameters:
-      - testcase (int): Number of test cases to run (if unsorted_array is not provided).
-      - order (str): 'normal' for ascending or 'reverse' for descending order.
-      - pdf (bool): Whether to generate a PDF report.
-      - unsorted_array (list, optional): A user-supplied list of words.
-      - min_length (int, optional): Minimum length for generating random words (if unsorted_array is not provided).
-      - max_length (int, optional): Maximum length for generating random words.
-      - select (int, optional): Number of words in each test case.
-      - method (str, optional): 'length' to sort by word length (default) or 'lex' for lexicographical order.
-    
-    Returns:
-      - sorted_result (list): The sorted list from the final test case.
-      - average_time (float): The average time taken to sort.
-    """
-    
-    # Determine test cases based on whether an unsorted_array is provided.
-    if unsorted_array is not None:
-        arrays = [unsorted_array]
-        actual_testcase = 1
-    else:
-        # Generate a list of random words for each test case.
-        arrays = [
-            [generate_random_word(min_length, max_length) for _ in range(select)]
-            for _ in range(testcase)
-        ]
-        actual_testcase = testcase
-
-    total_time = 0
-    sorted_result = None
-
-    # Run bubble sort on each test case.
-    for arr in arrays:
-        arr_copy = arr.copy()  # Work on a copy to preserve the original list.
-        start = time.perf_counter()
-        n = len(arr_copy)
-        # Bubble sort algorithm adapted for word comparisons.
-        for i in range(n):
-            for j in range(0, n - i - 1):
-                if method == 'length':
-                    if len(arr_copy[j]) > len(arr_copy[j+1]):
-                        arr_copy[j], arr_copy[j+1] = arr_copy[j+1], arr_copy[j]
-                elif method == 'lex':
-                    if arr_copy[j] > arr_copy[j+1]:
-                        arr_copy[j], arr_copy[j+1] = arr_copy[j+1], arr_copy[j]
-                else:
-                    raise ValueError("Method not recognized. Use 'length' or 'lex'.")
-        end = time.perf_counter()
-        total_time += (end - start)
-        sorted_result = arr_copy  # Save the result from the last test case.
-
-    average_time = total_time / actual_testcase
-
-    # Reverse the sorted result if required.
-    if order.lower() == 'reverse':
-        sorted_result = list(reversed(sorted_result))  
-        # The reason we can do this is because it does not affect our time as we hace stopped it already.
-
-    # Generate PDF report if requested.
-    if pdf:
-        description = (
-            "Bubble Sort is a simple comparison-based sorting algorithm.\n"
-            "This version has been adapted to sort words.\n"
-            "It can sort words either by length or lexicographically.\n"
-            "Time Complexity: Worst-case and average-case O(n²), Best-case O(n) for nearly sorted arrays."
-        )
-        generate_pdf_report("Bubble Sort (Words)", average_time, description, output_filename="bubble_sort_words_report.pdf")
-
-    return sorted_result, average_time
-
-
-
-def selection_sort(arr):
-    a = arr.copy()
-    n = len(a)
-    for i in range(n):
-        min_index = i
-        for j in range(i + 1, n):
-            if a[j] < a[min_index]:
-                min_index = j
-        a[i], a[min_index] = a[min_index], a[i]
-    return a
-
-def selection_sort_num(*, testcase, order, pdf, unsorted_array=None, min_val=None, max_val=None, select=None):
-    # Prepare test arrays.
-    if unsorted_array is not None:
-        arrays = [unsorted_array]
-        actual_testcase = 1
-    else:
-        if None in (min_val, max_val, select):
-            raise ValueError("Provide min_val, max_val, and select for random generation.")
-        arrays = [[random.randint(min_val, max_val) for _ in range(select)]
-                  for _ in range(testcase)]
-        actual_testcase = testcase
-
-    total_time = 0
-    sorted_result = None
-    for arr in arrays:
-        start = time.perf_counter()
-        sorted_arr = selection_sort(arr)
-        end = time.perf_counter()
-        if order.lower() == 'reverse':
-            sorted_arr = list(reversed(sorted_arr))
-        total_time += (end - start)
-        sorted_result = sorted_arr
-
-    average_time = total_time / actual_testcase
-
-    if pdf:
-        description = (
-            "Selection Sort repeatedly finds the minimum element and moves it to the beginning.\n"
-            "Time Complexity: O(n²) in all cases."
-        )
-        generate_pdf_report("Selection Sort (Numbers)", average_time, description,
-                            output_filename="selection_sort_num_report.pdf")
-    return sorted_result, average_time
-
-
-def _selection_sort_words(arr, method='length'):
-    a = arr.copy()
-    n = len(a)
-    for i in range(n):
-        min_index = i
-        for j in range(i + 1, n):
-            if not _compare(a[min_index], a[j], method):
-                min_index = j
-        a[i], a[min_index] = a[min_index], a[i]
-    return a
-
-def selection_sort_words(*, testcase, order, pdf, unsorted_array=None,
-                         min_length=3, max_length=10, select=10, method='length'):
-    if unsorted_array is not None:
-        arrays = [unsorted_array]
-        actual_testcase = 1
-    else:
-        arrays = [[generate_random_word(min_length, max_length) for _ in range(select)]
-                  for _ in range(testcase)]
-        actual_testcase = testcase
-
-    total_time = 0
-    sorted_result = None
-    for arr in arrays:
-        start = time.perf_counter()
-        sorted_arr = _selection_sort_words(arr, method=method)
-        end = time.perf_counter()
-        if order.lower() == 'reverse':
-            sorted_arr = list(reversed(sorted_arr))
-        total_time += (end - start)
-        sorted_result = sorted_arr
-
-    average_time = total_time / actual_testcase
-
-    if pdf:
-        description = (
-            "Selection Sort (Words) repeatedly finds the minimum word (by length or lexicographical order) and moves it to the beginning.\n"
-            "Time Complexity: O(n²) in all cases."
-        )
-        generate_pdf_report("Selection Sort (Words)", average_time, description,
-                            output_filename="selection_sort_words_report.pdf")
-    return sorted_result, average_time
-
-
-
-
-def insertion_sort(arr):
-    a = arr.copy()
-    for i in range(1, len(a)):
-        key = a[i]
-        j = i - 1
-        while j >= 0 and a[j] > key:
-            a[j + 1] = a[j]
-            j -= 1
-        a[j + 1] = key
-    return a
-
-def insertion_sort_num(*, testcase, order, pdf, unsorted_array=None, min_val=None, max_val=None, select=None):
-    if unsorted_array is not None:
-        arrays = [unsorted_array]
-        actual_testcase = 1
-    else:
-        if None in (min_val, max_val, select):
-            raise ValueError("Provide min_val, max_val, and select for random generation.")
-        arrays = [[random.randint(min_val, max_val) for _ in range(select)]
-                  for _ in range(testcase)]
-        actual_testcase = testcase
-
-    total_time = 0
-    sorted_result = None
-    for arr in arrays:
-        start = time.perf_counter()
-        sorted_arr = insertion_sort(arr)
-        end = time.perf_counter()
-        if order.lower() == 'reverse':
-            sorted_arr = list(reversed(sorted_arr))
-        total_time += (end - start)
-        sorted_result = sorted_arr
-
-    average_time = total_time / actual_testcase
-
-    if pdf:
-        description = (
-            "Insertion Sort builds the final sorted array one element at a time.\n"
-            "Time Complexity: Worst-case O(n²), Best-case O(n) for nearly sorted arrays."
-        )
-        generate_pdf_report("Insertion Sort (Numbers)", average_time, description,
-                            output_filename="insertion_sort_num_report.pdf")
-    return sorted_result, average_time
-
-
-def _insertion_sort_words(arr, method='length'):
-    a = arr.copy()
-    for i in range(1, len(a)):
-        key = a[i]
-        j = i - 1
-        if method == 'length':
-            while j >= 0 and len(a[j]) > len(key):
-                a[j + 1] = a[j]
-                j -= 1
-        elif method == 'lex':
-            while j >= 0 and a[j] > key:
-                a[j + 1] = a[j]
-                j -= 1
-        else:
-            raise ValueError("Method not recognized.")
-        a[j + 1] = key
-    return a
-
-def insertion_sort_words(*, testcase, order, pdf, unsorted_array=None,
-                         min_length=3, max_length=10, select=10, method='length'):
-    if unsorted_array is not None:
-        arrays = [unsorted_array]
-        actual_testcase = 1
-    else:
-        arrays = [[generate_random_word(min_length, max_length) for _ in range(select)]
-                  for _ in range(testcase)]
-        actual_testcase = testcase
-
-    total_time = 0
-    sorted_result = None
-    for arr in arrays:
-        start = time.perf_counter()
-        sorted_arr = _insertion_sort_words(arr, method=method)
-        end = time.perf_counter()
-        if order.lower() == 'reverse':
-            sorted_arr = list(reversed(sorted_arr))
-        total_time += (end - start)
-        sorted_result = sorted_arr
-
-    average_time = total_time / actual_testcase
-
-    if pdf:
-        description = (
-            "Insertion Sort (Words) builds the final sorted list one word at a time.\n"
-            "Time Complexity: Worst-case O(n²), Best-case O(n) for nearly sorted lists."
-        )
-        generate_pdf_report("Insertion Sort (Words)", average_time, description,
-                            output_filename="insertion_sort_words_report.pdf")
-    return sorted_result, average_time
-
-
-
-# Helper for median-of-three
-def median_of_three(a, low, high):
+# Helper for median-of-three (numbers)
+def _median_of_three_num(a, low, high):
     mid = (low + high) // 2
     if a[low] > a[mid]:
         a[low], a[mid] = a[mid], a[low]
@@ -370,7 +22,8 @@ def median_of_three(a, low, high):
         a[mid], a[high] = a[high], a[mid]
     return mid
 
-def partition(a, low, high):
+# Helper for partition (numbers)
+def _partition_num(a, low, high):
     pivot = a[high]
     i = low - 1
     for j in range(low, high):
@@ -380,128 +33,30 @@ def partition(a, low, high):
     a[i + 1], a[high] = a[high], a[i + 1]
     return i + 1
 
-def median_sort(arr):
-    a = arr.copy()
-    def _median_sort_helper(a, low, high):
-        if low < high:
-            m_index = median_of_three(a, low, high)
-            a[m_index], a[high] = a[high], a[m_index]
-            p = partition(a, low, high)
-            _median_sort_helper(a, low, p - 1)
-            _median_sort_helper(a, p + 1, high)
-    _median_sort_helper(a, 0, len(a) - 1)
-    return a
-
-def median_sort_num(*, testcase, order, pdf, unsorted_array=None, min_val=None, max_val=None, select=None):
-    if unsorted_array is not None:
-        arrays = [unsorted_array]
-        actual_testcase = 1
-    else:
-        if None in (min_val, max_val, select):
-            raise ValueError("Provide min_val, max_val, and select for random generation.")
-        arrays = [[random.randint(min_val, max_val) for _ in range(select)]
-                  for _ in range(testcase)]
-        actual_testcase = testcase
-
-    total_time = 0
-    sorted_result = None
-    for arr in arrays:
-        start = time.perf_counter()
-        sorted_arr = median_sort(arr)
-        end = time.perf_counter()
-        if order.lower() == 'reverse':
-            sorted_arr = list(reversed(sorted_arr))
-        total_time += (end - start)
-        sorted_result = sorted_arr
-
-    average_time = total_time / actual_testcase
-
-    if pdf:
-        description = (
-            "Median Sort is a variant of Quick Sort using median-of-three pivot selection.\n"
-            "Average Time Complexity: O(n log n), Worst-case: O(n²)."
-        )
-        generate_pdf_report("Median Sort (Numbers)", average_time, description,
-                            output_filename="median_sort_num_report.pdf")
-    return sorted_result, average_time
-
-
-
-def _median_of_three_words(a, low, high, method):
+# Helper for median-of-three (words)
+def _median_of_three_words(a, low, high, compare_func):
     mid = (low + high) // 2
-    if not _compare(a[low], a[mid], method):
+    if not compare_func(a[low], a[mid]):
         a[low], a[mid] = a[mid], a[low]
-    if not _compare(a[low], a[high], method):
+    if not compare_func(a[low], a[high]):
         a[low], a[high] = a[high], a[low]
-    if not _compare(a[mid], a[high], method):
+    if not compare_func(a[mid], a[high]):
         a[mid], a[high] = a[high], a[mid]
     return mid
 
-def _partition_words(a, low, high, method):
+# Helper for partition (words)
+def _partition_words(a, low, high, compare_func):
     pivot = a[high]
     i = low - 1
     for j in range(low, high):
-        if _compare(a[j], pivot, method):
+        if compare_func(a[j], pivot):
             i += 1
             a[i], a[j] = a[j], a[i]
     a[i + 1], a[high] = a[high], a[i + 1]
     return i + 1
 
-def _median_sort_words(a, low, high, method):
-    if low < high:
-        m_index = _median_of_three_words(a, low, high, method)
-        a[m_index], a[high] = a[high], a[m_index]
-        p = _partition_words(a, low, high, method)
-        _median_sort_words(a, low, p - 1, method)
-        _median_sort_words(a, p + 1, high, method)
-
-def _median_sort_words_wrapper(arr, method='length'):
-    a = arr.copy()
-    _median_sort_words(a, 0, len(a) - 1, method)
-    return a
-
-def median_sort_words(*, testcase, order, pdf, unsorted_array=None,
-                      min_length=3, max_length=10, select=10, method='length'):
-    if unsorted_array is not None:
-        arrays = [unsorted_array]
-        actual_testcase = 1
-    else:
-        arrays = [[generate_random_word(min_length, max_length) for _ in range(select)]
-                  for _ in range(testcase)]
-        actual_testcase = testcase
-
-    total_time = 0
-    sorted_result = None
-    for arr in arrays:
-        start = time.perf_counter()
-        sorted_arr = _median_sort_words_wrapper(arr, method=method)
-        end = time.perf_counter()
-        if order.lower() == 'reverse':
-            sorted_arr = list(reversed(sorted_arr))
-        total_time += (end - start)
-        sorted_result = sorted_arr
-
-    average_time = total_time / actual_testcase
-
-    if pdf:
-        description = (
-            "Median Sort (Words) is a variant of Quick Sort using median-of-three pivot selection with custom comparisons.\n"
-            "Average Time Complexity: O(n log n), Worst-case: O(n²)."
-        )
-        generate_pdf_report("Median Sort (Words)", average_time, description,
-                            output_filename="median_sort_words_report.pdf")
-    return sorted_result, average_time
-
-
-def merge_sort(arr):
-    if len(arr) <= 1:
-        return arr
-    mid = len(arr) // 2
-    left = merge_sort(arr[:mid])
-    right = merge_sort(arr[mid:])
-    return _merge(left, right)
-
-def _merge(left, right):
+# Helper for merge (numbers)
+def _merge_num(left, right):
     result = []
     i = j = 0
     while i < len(left) and j < len(right):
@@ -515,45 +70,12 @@ def _merge(left, right):
     result.extend(right[j:])
     return result
 
-def merge_sort_num(*, testcase, order, pdf, unsorted_array=None, min_val=None, max_val=None, select=None):
-    if unsorted_array is not None:
-        arrays = [unsorted_array]
-        actual_testcase = 1
-    else:
-        if None in (min_val, max_val, select):
-            raise ValueError("Provide min_val, max_val, and select for random generation.")
-        arrays = [[random.randint(min_val, max_val) for _ in range(select)]
-                  for _ in range(testcase)]
-        actual_testcase = testcase
-
-    total_time = 0
-    sorted_result = None
-    for arr in arrays:
-        start = time.perf_counter()
-        sorted_arr = merge_sort(arr)
-        end = time.perf_counter()
-        if order.lower() == 'reverse':
-            sorted_arr = list(reversed(sorted_arr))
-        total_time += (end - start)
-        sorted_result = sorted_arr
-
-    average_time = total_time / actual_testcase
-
-    if pdf:
-        description = (
-            "Merge Sort divides the array into halves, sorts them, and merges the sorted halves.\n"
-            "Time Complexity: O(n log n) in all cases."
-        )
-        generate_pdf_report("Merge Sort (Numbers)", average_time, description,
-                            output_filename="merge_sort_num_report.pdf")
-    return sorted_result, average_time
-
-
-def _merge_words(left, right, method):
+# Helper for merge (words)
+def _merge_words(left, right, compare_func):
     result = []
     i = j = 0
     while i < len(left) and j < len(right):
-        if _compare(left[i], right[j], method):
+        if compare_func(left[i], right[j]):
             result.append(left[i])
             i += 1
         else:
@@ -563,126 +85,503 @@ def _merge_words(left, right, method):
     result.extend(right[j:])
     return result
 
-def _merge_sort_words(arr, method):
-    if len(arr) <= 1:
-        return arr
-    mid = len(arr) // 2
-    left = _merge_sort_words(arr[:mid], method)
-    right = _merge_sort_words(arr[mid:], method)
-    return _merge_words(left, right, method)
+# --- Heap Sort Helpers ---
+def _heapify(arr, n, i, compare_func):
+    """
+    Heapify a subtree rooted at node 'i' (index 'i' in 0-based array),
+    which is an index in 'arr[]. n is size of heap.
+    This function assumes that the left and right subtrees of 'i' are already heaps.
+    It makes 'i' the root of a min-heap.
+    """
+    smallest = i  # Initialize smallest as root
+    l = 2 * i + 1     # left child index
+    r = 2 * i + 2     # right child index
 
-def merge_sort_words(*, testcase, order, pdf, unsorted_array=None,
-                     min_length=3, max_length=10, select=10, method='length'):
-    if unsorted_array is not None:
-        arrays = [unsorted_array]
-        actual_testcase = 1
-    else:
-        arrays = [[generate_random_word(min_length, max_length) for _ in range(select)]
-                  for _ in range(testcase)]
-        actual_testcase = testcase
+    # If left child exists and is smaller than root
+    if l < n and compare_func(arr[l], arr[smallest]):
+        smallest = l
 
-    total_time = 0
-    sorted_result = None
-    for arr in arrays:
-        start = time.perf_counter()
-        sorted_arr = _merge_sort_words(arr, method)
-        end = time.perf_counter()
-        if order.lower() == 'reverse':
-            sorted_arr = list(reversed(sorted_arr))
-        total_time += (end - start)
-        sorted_result = sorted_arr
+    # If the right child exists and is smaller than smallest so far
+    if r < n and compare_func(arr[r], arr[smallest]):
+        smallest = r
 
-    average_time = total_time / actual_testcase
+    # If smallest is not the root
+    if smallest != i:
+        # Swap the root with the smallest element
+        arr[i], arr[smallest] = arr[smallest], arr[i]
 
-    if pdf:
-        description = (
-            "Merge Sort (Words) divides the list into halves, sorts each half using the chosen comparison, and merges them.\n"
-            "Time Complexity: O(n log n) in all cases."
-        )
-        generate_pdf_report("Merge Sort (Words)", average_time, description,
-                            output_filename="merge_sort_words_report.pdf")
-    return sorted_result, average_time
+        # Recursively heapify the affected sub-tree
+        _heapify(arr, n, smallest, compare_func)
 
 
-def quicksort(arr):
+def build_heap(arr, compare_func):
+    """
+    Builds a min-heap from an unordered array.
+    """
+    n = len(arr)
+    # Index of last non-leaf node is floor(n/2) - 1
+    start_index = math.floor(n / 2) - 1
+
+    # Perform reverse level order traversal from last non-leaf node and heapify each node
+    for i in range(start_index, -1, -1):
+        _heapify(arr, n, i, compare_func)
+
+# --- Core Sorting Algorithms (Generic, Comparison-Based) ---
+
+def bubble_sort_num(arr, order='normal', testcase=1, select=100, min_val=0, max_val=1000, pdf=False, test_case_sizes=None, input_description=None):
+    """
+    Sorts the array using bubble sort - numbers only.
+    """
     a = arr.copy()
-    if len(a) <= 1:
+    compare_func = lambda x, y: x <= y
+    if order == 'reverse':
+        compare_func = lambda x, y: x >= y
+    n = len(a)
+    start_time = time.perf_counter()
+    for i in range(n):
+        for j in range(0, n - i - 1):
+            if not compare_func(a[j], a[j+1]):
+                a[j], a[j+1] = a[j+1], a[j]
+    end_time = time.perf_counter()
+    sort_time = end_time - start_time
+    return a, sort_time, [sort_time]  # Return sorted array, time, and test case times
+
+
+def bubble_sort_words(arr, order='normal', testcase=1, select=100, min_length=3, max_length=10, method='length', pdf=False, test_case_sizes=None, input_description=None):
+    """
+    Sorts the array using bubble sort - words only.
+    """
+    a = arr.copy()
+    if method == 'length':
+        compare_func = lambda x, y: len(x) <= len(y)
+    else: # method == 'lex'
+        compare_func = lambda x, y: x <= y
+    if order == 'reverse':
+        if method == 'length':
+            compare_func = lambda x, y: len(x) >= len(y)
+        else: # method == 'lex'
+            compare_func = lambda x, y: x >= y
+
+    n = len(a)
+    start_time = time.perf_counter()
+    for i in range(n):
+        for j in range(0, n - i - 1):
+            if not compare_func(a[j], a[j+1]):
+                a[j], a[j+1] = a[j+1], a[j]
+    end_time = time.perf_counter()
+    sort_time = end_time - start_time
+    return a, sort_time, [sort_time] # Returns sorted array, time, and test_case_times
+
+
+def selection_sort_num(arr, order='normal', testcase=1, select=100, min_val=0, max_val=1000, pdf=False, test_case_sizes=None, input_description=None):
+    """
+    Sorts the array using selection sort - numbers
+    """
+    a = arr.copy()
+    compare_func = lambda x, y: x <= y
+    if order == 'reverse':
+        compare_func = lambda x, y: x >= y
+
+    n = len(a)
+    start_time = time.perf_counter()
+    for i in range(n):
+        min_index = i
+        for j in range(i + 1, n):
+            if compare_func(a[j], a[min_index]):
+                min_index = j
+        a[i], a[min_index] = a[min_index], a[i]
+    end_time = time.perf_counter()
+    sort_time = end_time - start_time
+    return a, sort_time, [sort_time] # Returns sorted array, time, and test_case_times
+
+
+def selection_sort_words(arr, order='normal', testcase=1, select=100, min_length=3, max_length=10, method='length', pdf=False, test_case_sizes=None, input_description=None):
+    """
+    Sorts the array using selection sort - words
+    """
+    a = arr.copy()
+    if method == 'length':
+        compare_func = lambda x, y: len(x) <= len(y)
+    else: # method == 'lex'
+        compare_func = lambda x, y: x <= y
+    if order == 'reverse':
+        if method == 'length':
+            compare_func = lambda x, y: len(x) >= len(y)
+        else: # method == 'lex'
+            compare_func = lambda x, y: x >= y
+
+    n = len(a)
+    start_time = time.perf_counter()
+    for i in range(n):
+        min_index = i
+        for j in range(i + 1, n):
+            if compare_func(a[j], a[min_index]):
+                min_index = j
+        a[i], a[min_index] = a[min_index], a[i]
+    end_time = time.perf_counter()
+    sort_time = end_time - start_time
+    return a, sort_time, [sort_time] # Returns sorted array, time, and test_case_times
+
+
+def insertion_sort_num(arr, order='normal', testcase=1, select=100, min_val=0, max_val=1000, pdf=False, test_case_sizes=None, input_description=None):
+    """
+    Sorts the array using insertion sort - numbers
+    """
+    a = arr.copy()
+    compare_func = lambda x, y: x <= y
+    if order == 'reverse':
+        compare_func = lambda x, y: x >= y
+
+    start_time = time.perf_counter()
+    for i in range(1, len(a)):
+        key = a[i]
+        j = i - 1
+        while j >= 0 and compare_func(key, a[j]):
+            a[j + 1] = a[j]
+            j -= 1
+        a[j + 1] = key
+    end_time = time.perf_counter()
+    sort_time = end_time - start_time
+    return a, sort_time, [sort_time] # Returns sorted array, time, and test_case_times
+
+
+def insertion_sort_words(arr, order='normal', testcase=1, select=100, min_length=3, max_length=10, method='length', pdf=False, test_case_sizes=None, input_description=None):
+    """
+    Sorts the array using insertion sort - words
+    """
+    a = arr.copy()
+    if method == 'length':
+        compare_func = lambda x, y: len(x) <= len(y)
+    else: # method == 'lex'
+        compare_func = lambda x, y: x <= y
+    if order == 'reverse':
+        if method == 'length':
+            compare_func = lambda x, y: len(x) >= len(y)
+        else: # method == 'lex'
+            compare_func = lambda x, y: x >= y
+
+    start_time = time.perf_counter()
+    for i in range(1, len(a)):
+        key = a[i]
+        j = i - 1
+        while j >= 0 and compare_func(key, a[j]):
+            a[j + 1] = a[j]
+            j -= 1
+        a[j + 1] = key
+    end_time = time.perf_counter()
+    sort_time = end_time - start_time
+    return a, sort_time, [sort_time] # Returns sorted array, time, and test_case_times
+
+
+def median_sort_num(arr, order='normal', testcase=1, select=100, min_val=0, max_val=1000, pdf=False, test_case_sizes=None, input_description=None):
+    """
+    Sorts the array using median sort - numbers
+    """
+    a = arr.copy()
+    compare_func = lambda x, y: x <= y
+    if order == 'reverse':
+        compare_func = lambda x, y: x >= y
+    is_numeric_comparison = compare_func == (lambda x, y: x <= y)
+
+    def _median_sort_helper(a, low, high, compare_func, is_numeric_comparison):
+        if low < high:
+            m_index = _median_of_three_num(a, low, high) if is_numeric_comparison else _median_of_three_words(a, low, high, compare_func)
+            a[m_index], a[high] = a[high], a[m_index]
+            p = _partition_num(a, low, high) if is_numeric_comparison else _partition_words(a, low, high, compare_func)
+            _median_sort_helper(a, low, p - 1, compare_func, is_numeric_comparison)
+            _median_sort_helper(a, p + 1, high, compare_func, is_numeric_comparison)
+
+    start_time = time.perf_counter()
+    _median_sort_helper(a, 0, len(a) - 1, compare_func, is_numeric_comparison)
+    end_time = time.perf_counter()
+    sort_time = end_time - start_time
+    return a, sort_time, [sort_time] # Returns sorted array, time, and test_case_times
+
+
+def median_sort_words(arr, order='normal', testcase=1, select=100, min_length=3, max_length=10, method='length', pdf=False, test_case_sizes=None, input_description=None):
+    """
+    Sorts the array using median sort - words
+    """
+    a = arr.copy()
+    if method == 'length':
+        compare_func = lambda x, y: len(x) <= len(y)
+    else: # method == 'lex'
+        compare_func = lambda x, y: x <= y
+    if order == 'reverse':
+        if method == 'length':
+            compare_func = lambda x, y: len(x) >= len(y)
+        else: # method == 'lex'
+            compare_func = lambda x, y: x >= y
+
+
+    def _median_sort_helper(a, low, high, compare_func): # Removed is_numeric_comparison
+        if low < high:
+            m_index = _median_of_three_words(a, low, high, compare_func) # Removed conditional median selection
+            a[m_index], a[high] = a[high], a[m_index]
+            p = _partition_words(a, low, high, compare_func) # Removed conditional partition selection
+            _median_sort_helper(a, low, p - 1, compare_func) # Removed is_numeric_comparison
+            _median_sort_helper(a, p + 1, high, compare_func) # Removed is_numeric_comparison
+
+    start_time = time.perf_counter()
+    _median_sort_helper(a, 0, len(a) - 1, compare_func) # Removed is_numeric_comparison
+    end_time = time.perf_counter()
+    sort_time = end_time - start_time
+    return a, sort_time, [sort_time] # Returns sorted array, time, and test_case_times
+
+
+def merge_sort_num(arr, order='normal', testcase=1, select=100, min_val=0, max_val=1000, pdf=False, test_case_sizes=None, input_description=None):
+    """
+    Sorts the array using merge sort - numbers
+    """
+    a = arr.copy()
+    compare_func = lambda x, y: x <= y
+    if order == 'reverse':
+        compare_func = lambda x, y: x >= y
+
+    start_time_total = time.perf_counter()
+    def _merge_sort_helper(arr, compare_func): # Removed is_numeric_comparison
+        if len(arr) <= 1:
+            return arr
+        mid = len(arr) // 2
+        left = _merge_sort_helper(arr[:mid], compare_func) # Removed is_numeric_comparison
+        right = _merge_sort_helper(arr[mid:], compare_func) # Removed is_numeric_comparison
+        return _merge_num(left, right) # Removed conditional merge selection
+
+    sorted_a = _merge_sort_helper(a, compare_func) # Removed is_numeric_comparison
+    end_time_total = time.perf_counter()
+    sort_time = end_time_total - start_time_total
+    return sorted_a, sort_time, [sort_time] # Returns sorted array, time, and test_case_times
+
+
+def merge_sort_words(arr, order='normal', testcase=1, select=100, min_length=3, max_length=10, method='length', pdf=False, test_case_sizes=None, input_description=None):
+    """
+    Sorts the array using merge sort - words
+    """
+    a = arr.copy()
+    if method == 'length':
+        compare_func = lambda x, y: len(x) <= len(y)
+    else: # method == 'lex'
+        compare_func = lambda x, y: x <= y
+    if order == 'reverse':
+        if method == 'length':
+            compare_func = lambda x, y: len(x) >= len(y)
+        else: # method == 'lex'
+            compare_func = lambda x, y: x >= y
+
+
+    start_time_total = time.perf_counter()
+    def _merge_sort_helper(arr, compare_func): # Removed is_numeric_comparison
+        if len(arr) <= 1:
+            return arr
+        mid = len(arr) // 2
+        left = _merge_sort_helper(arr[:mid], compare_func) # Removed is_numeric_comparison
+        right = _merge_sort_helper(arr[mid:], compare_func) # Removed is_numeric_comparison
+        return _merge_words(left, right, compare_func) # Removed conditional merge selection
+
+    sorted_a = _merge_sort_helper(a, compare_func) # Removed is_numeric_comparison
+    end_time_total = time.perf_counter()
+    sort_time = end_time_total - start_time_total
+    return sorted_a, sort_time, [sort_time] # Returns sorted array, time, and test_case_times
+
+
+def quick_sort_num(arr, order='normal', testcase=1, select=100, min_val=0, max_val=1000, pdf=False, test_case_sizes=None, input_description=None):
+    """
+    Sorts the array using quicksort - numbers
+    """
+    a = arr.copy()
+    compare_func = lambda x, y: x <= y
+    if order == 'reverse':
+        compare_func = lambda x, y: x >= y
+
+    start_time = time.perf_counter()
+    def _quicksort_helper(a, compare_func):
+        if len(a) <= 1:
+            return a
+        # --- Random Pivot Selection ---
+        pivot_index = random.randint(0, len(a) - 1) # Generate a random index within the array
+        pivot = a[pivot_index] # Select the element at the random index as pivot
+        a[0], a[pivot_index] = a[pivot_index], a[0] # Swap pivot with the first element (optional, for consistency with original logic)
+        # --- End Random Pivot Selection ---
+
+        less = [x for x in a[1:] if compare_func(x, pivot)]
+        greater = [x for x in a[1:] if not compare_func(x, pivot)]
+        return _quicksort_helper(less, compare_func) + [pivot] + _quicksort_helper(greater, compare_func)
+
+    sorted_a = _quicksort_helper(a, compare_func)
+    end_time = time.perf_counter()
+    sort_time = end_time - start_time
+    return sorted_a, sort_time, [sort_time] # Returns sorted array, time, and test_case_times
+
+
+def quicksort_words(arr, order='normal', testcase=1, select=100, min_length=3, max_length=10, method='length', pdf=False, test_case_sizes=None, input_description=None):
+    """
+    Sorts the array using quicksort - words
+    """
+    a = arr.copy()
+    if method == 'length':
+        compare_func = lambda x, y: len(x) <= len(y)
+    else: # method == 'lex'
+        compare_func = lambda x, y: x <= y
+    if order == 'reverse':
+        if method == 'length':
+            compare_func = lambda x, y: len(x) >= len(y)
+        else: # method == 'lex'
+            compare_func = lambda x, y: x >= y
+
+    start_time = time.perf_counter()
+    def _quicksort_helper(a, compare_func):
+        if len(a) <= 1:
+            return a
+        pivot = a[0]
+        less = [x for x in a[1:] if compare_func(x, pivot)]
+        greater = [x for x in a[1:] if not compare_func(x, pivot)]
+        return _quicksort_helper(less, compare_func) + [pivot] + _quicksort_helper(greater, compare_func)
+
+    sorted_a = _quicksort_helper(a, compare_func)
+    end_time = time.perf_counter()
+    sort_time = end_time - start_time
+    return sorted_a, sort_time, [sort_time] # Returns sorted array, time, and test_case_times
+
+
+def heap_sort_num(arr, order='normal', testcase=1, select=100, min_val=0, max_val=1000, pdf=False, test_case_sizes=None, input_description=None, count_heapify=False):
+    """
+    Sorts the array using heap sort - numbers
+    """
+    a = arr.copy()
+    compare_func = lambda x, y: x <= y
+    if order == 'reverse':
+        compare_func = lambda x, y: x >= y
+    n = len(a)
+    heapify_time = 0
+
+    if count_heapify:
+        start_heapify = time.perf_counter()
+        build_heap(a, compare_func)
+        end_heapify = time.perf_counter()
+        heapify_time = end_heapify - start_heapify
+    else:
+        build_heap(a, compare_func)
+
+    sorted_array = []
+
+    start_sort = time.perf_counter()
+    for _ in range(n):
+        smallest_element = a[0]
+        sorted_array.append(smallest_element)
+        a[0] = a[-1]
+        a.pop()
+        if len(a) > 0:
+            _heapify(a, len(a), 0, compare_func)
+    end_sort = time.perf_counter()
+    sort_time = end_sort - start_sort
+    total_time = sort_time + heapify_time if count_heapify else sort_time
+    return sorted_array, total_time, [total_time] # Returns sorted array, time, and test_case_times
+
+
+def heap_sort_words(arr, order='normal', testcase=1, select=100, min_length=3, max_length=10, method='length', pdf=False, test_case_sizes=None, input_description=None, count_heapify=False):
+    """
+    Sorts the array using heap sort - words
+    """
+    a = arr.copy()
+    if method == 'length':
+        compare_func = lambda x, y: len(x) <= len(y)
+    else: # method == 'lex'
+        compare_func = lambda x, y: x <= y
+    if order == 'reverse':
+        if method == 'length':
+            compare_func = lambda x, y: len(x) >= len(y)
+        else: # method == 'lex'
+            compare_func = lambda x, y: x >= y
+
+    n = len(a)
+    heapify_time = 0
+
+    if count_heapify:
+        start_heapify = time.perf_counter()
+        build_heap(a, compare_func)
+        end_heapify = time.perf_counter()
+        heapify_time = end_heapify - start_heapify
+    else:
+        build_heap(a, compare_func)
+
+    sorted_array = []
+    start_sort = time.perf_counter()
+    for _ in range(n):
+        smallest_element = a[0]
+        sorted_array.append(smallest_element)
+        a[0] = a[-1]
+        a.pop()
+        if len(a) > 0:
+            _heapify(a, len(a), 0, compare_func)
+    end_sort = time.perf_counter()
+    sort_time = end_sort - start_sort
+    total_time = sort_time + heapify_time if count_heapify else sort_time
+    return sorted_array, total_time, [total_time] # Returns sorted array, time, and test_case_times
+
+
+def radix_sort_num(arr):
+    """
+    Sorts non-negative integers using Radix Sort in Ascending Order.
+    """
+    a = arr.copy()
+    if not all(isinstance(x, int) and x >= 0 for x in a):
+        raise ValueError("Radix Sort can only be used for non-negative integers.")
+    if not a: # Handle empty array case
         return a
-    pivot = a[0]
-    less = [x for x in a[1:] if x <= pivot]
-    greater = [x for x in a[1:] if x > pivot]
-    return quicksort(less) + [pivot] + quicksort(greater)
 
-def quicksort_num(*, testcase, order, pdf, unsorted_array=None, min_val=None, max_val=None, select=None):
-    if unsorted_array is not None:
-        arrays = [unsorted_array]
-        actual_testcase = 1
+    max_val = max(a)
+    num_digits = len(str(max_val))
+    start_time = time.perf_counter() # Start timing here
+    for digit_place in range(num_digits):
+        buckets = [[] for _ in range(10)]  # 10 buckets for digits 0-9
+        for num in a:
+            digit = (num // (10**digit_place)) % 10
+            buckets[digit].append(num)
+        a = []
+        for bucket in buckets:
+            a.extend(bucket)
+    end_time = time.perf_counter() # End timing here
+    sort_time = end_time - start_time
+    return a, sort_time, [sort_time] # Returns sorted array, time, and test_case_times
+
+
+# --- Algorithm Description Function ---
+def get_algorithm_description(algorithm_name, data_type, method=None, count_heapify=False):
+    """Returns a description for each algorithm for report generation."""
+    descriptions = {
+        "bubble_sort_num": "Bubble Sort: Compares adjacent elements and swaps them if they are in the wrong order, repeatedly.",
+        "bubble_sort_words": "Bubble Sort: Compares adjacent words and swaps them if they are in the wrong order, repeatedly.",
+        "selection_sort_num": "Selection Sort: Repeatedly finds the minimum element from the unsorted part and places it at the beginning.",
+        "selection_sort_words": "Selection Sort: Repeatedly finds the minimum word from the unsorted part and places it at the beginning.",
+        "insertion_sort_num": "Insertion Sort: Builds the final sorted array one item at a time by comparisons.",
+        "insertion_sort_words": "Insertion Sort: Builds the final sorted array of words one item at a time by comparisons.",
+        "median_sort_num": "Median Sort (QuickSort with Median-of-Three Pivot): A divide-and-conquer algorithm using median-of-three for pivot selection to improve performance.",
+        "median_sort_words": "Median Sort (QuickSort with Median-of-Three Pivot): Sorts words using quicksort with median-of-three pivot strategy.",
+        "merge_sort_num": "Merge Sort: A divide-and-conquer algorithm that divides the array into halves, recursively sorts them, and then merges them.",
+        "merge_sort_words": "Merge Sort: Sorts words using a divide-and-conquer approach, merging sorted sub-arrays.",
+        "quicksort_num": "Quick Sort: A highly efficient divide-and-conquer algorithm, using a pivot to partition the array.",
+        "quicksort_words": "Quick Sort: Sorts words efficiently using a divide-and-conquer approach with partitioning.",
+        "heap_sort_num": "Heap Sort: Uses a binary heap data structure to sort elements.",
+        "heap_sort_words": "Heap Sort: Sorts words using a binary heap.",
+        "radix_sort_num": "Radix Sort: Sorts integers by processing individual digits. Efficient for integers but not comparison-based."
+    }
+    description_key = algorithm_name # Use function name as key directly
+
+    if data_type == 'words':
+        if method == 'length':
+            description = descriptions.get(algorithm_name, "Description not available.") + " Words are compared based on their length."
+        elif method == 'lex':
+            description = descriptions.get(algorithm_name, "Description not available.") + " Words are compared lexicographically."
+        else:
+            description = descriptions.get(algorithm_name, "Description not available.") # Base description if method is somehow not specified
+    elif data_type == 'numbers':
+         description = descriptions.get(algorithm_name, "Description not available.")
     else:
-        if None in (min_val, max_val, select):
-            raise ValueError("Provide min_val, max_val, and select for random generation.")
-        arrays = [[random.randint(min_val, max_val) for _ in range(select)]
-                  for _ in range(testcase)]
-        actual_testcase = testcase
+        description = "Algorithm description not available." # Fallback
 
-    total_time = 0
-    sorted_result = None
-    for arr in arrays:
-        start = time.perf_counter()
-        sorted_arr = quicksort(arr)
-        end = time.perf_counter()
-        if order.lower() == 'reverse':
-            sorted_arr = list(reversed(sorted_arr))
-        total_time += (end - start)
-        sorted_result = sorted_arr
-
-    average_time = total_time / actual_testcase
-
-    if pdf:
-        description = (
-            "Quick Sort is a divide-and-conquer algorithm that partitions the list around a pivot.\n"
-            "Average Time Complexity: O(n log n), Worst-case: O(n²)."
-        )
-        generate_pdf_report("Quick Sort (Numbers)", average_time, description,
-                            output_filename="quicksort_num_report.pdf")
-    return sorted_result, average_time
-
-
-def _quicksort_words(arr, method):
-    if len(arr) <= 1:
-        return arr
-    pivot = arr[0]
-    less = [x for x in arr[1:] if _compare(x, pivot, method)]
-    greater = [x for x in arr[1:] if not _compare(x, pivot, method)]
-    return _quicksort_words(less, method) + [pivot] + _quicksort_words(greater, method)
-
-def quicksort_words(*, testcase, order, pdf, unsorted_array=None,
-                    min_length=3, max_length=10, select=10, method='length'):
-    if unsorted_array is not None:
-        arrays = [unsorted_array]
-        actual_testcase = 1
-    else:
-        arrays = [[generate_random_word(min_length, max_length) for _ in range(select)]
-                  for _ in range(testcase)]
-        actual_testcase = testcase
-
-    total_time = 0
-    sorted_result = None
-    for arr in arrays:
-        start = time.perf_counter()
-        sorted_arr = _quicksort_words(arr.copy(), method)
-        end = time.perf_counter()
-        if order.lower() == 'reverse':
-            sorted_arr = list(reversed(sorted_arr))
-        total_time += (end - start)
-        sorted_result = sorted_arr
-
-    average_time = total_time / actual_testcase
-
-    if pdf:
-        description = (
-            "Quick Sort (Words) is a divide-and-conquer algorithm that partitions the list around a pivot using custom comparisons.\n"
-            "Average Time Complexity: O(n log n), Worst-case: O(n²)."
-        )
-        generate_pdf_report("Quick Sort (Words)", average_time, description,
-                            output_filename="quicksort_words_report.pdf")
-    return sorted_result, average_time
+    if algorithm_name == "heap_sort_num" or algorithm_name == "heap_sort_words":
+        if count_heapify:
+            description += " Includes time to build the initial heap in total execution time."
+        else:
+            description += " Excludes time to build the initial heap from total execution time."
+    return description
