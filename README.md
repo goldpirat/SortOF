@@ -1,9 +1,9 @@
-# Sort-O-Matic: Your Python Sorting Algorithm Benchmarking Library
+# SortOF: Your Python Sorting Algorithm Benchmarking Library
 
 [![Python Version](https://www.python.org/)](https://www.python.org/)
 [![License](https://opensource.org/licenses/MIT)](https://opensource.org/licenses/MIT)
 
-**Sort-O-Matic** is a Python library designed to help you explore and benchmark the performance of various sorting algorithms **programmatically**.  It provides functions to easily benchmark sorting algorithms within your Python code and generate insightful reports.  While a basic script (`main.py`) is included for demonstration and quick tests, the primary focus is on using Sort-O-Matic as a library in your own Python projects.
+**SortOF** is a Python library designed to help you explore and benchmark the performance of various sorting algorithms **programmatically**.  It provides functions to easily benchmark sorting algorithms within your Python code and generate insightful reports.  While a basic script (`main.py`) is included for demonstration and quick tests, the primary focus is on using SortOF as a library in your own Python projects.
 
 ## Features
 
@@ -59,7 +59,7 @@
 
 #### Programmatic Use (Recommended - Library Usage)
 
-Sort-O-Matic is designed to be used as a library within your Python scripts. Here's how to benchmark sorting algorithms programmatically:
+SortOF is designed to be used as a library within your Python scripts. Here's how to benchmark sorting algorithms programmatically:
 
 ```python
 import sortof as stf
@@ -139,4 +139,4 @@ Flori Kusari - florikusari28@gmail.com
 
 -----
 
-**Start benchmarking sorting algorithms in your Python projects with Sort-O-Matic Library!**
+**Start benchmarking sorting algorithms in your Python projects with SortOF Library!**
