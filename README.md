@@ -118,10 +118,9 @@ sortof/
 
 ## Dependencies
 
-
-  * **python-benedict:** For enhanced dictionary functionalities (used in report generation). // Will be used
-  * **Latex and pdflatex:** Required for PDF report generation (reportlab is used as a fallback if LaTeX is not available, but LaTeX is recommended for better quality).
-  * **reportlab:** Python library for generating PDF documents (used if LaTeX is not available).
+  * **LaTeX:** Required for PDF report generation.
+  * **pylatex:** Python library for generating PDF documents.
+  * **MatPlotLib:** Python library for generating visualization in function.
 
 Dependencies are listed in `requirements.txt`. Install them using `pip install -r requirements.txt`.
 
