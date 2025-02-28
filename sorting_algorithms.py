@@ -549,39 +549,38 @@ def radix_sort_num(arr):
 def get_algorithm_description(algorithm_name, data_type, method=None, count_heapify=False):
     """Returns a description for each algorithm for report generation."""
     descriptions = {
-        "bubble_sort_num": "Bubble Sort: Compares adjacent elements and swaps them if they are in the wrong order, repeatedly.",
-        "bubble_sort_words": "Bubble Sort: Compares adjacent words and swaps them if they are in the wrong order, repeatedly.",
-        "selection_sort_num": "Selection Sort: Repeatedly finds the minimum element from the unsorted part and places it at the beginning.",
-        "selection_sort_words": "Selection Sort: Repeatedly finds the minimum word from the unsorted part and places it at the beginning.",
-        "insertion_sort_num": "Insertion Sort: Builds the final sorted array one item at a time by comparisons.",
-        "insertion_sort_words": "Insertion Sort: Builds the final sorted array of words one item at a time by comparisons.",
-        "median_sort_num": "Median Sort (QuickSort with Median-of-Three Pivot): A divide-and-conquer algorithm using median-of-three for pivot selection to improve performance.",
-        "median_sort_words": "Median Sort (QuickSort with Median-of-Three Pivot): Sorts words using quicksort with median-of-three pivot strategy.",
-        "merge_sort_num": "Merge Sort: A divide-and-conquer algorithm that divides the array into halves, recursively sorts them, and then merges them.",
-        "merge_sort_words": "Merge Sort: Sorts words using a divide-and-conquer approach, merging sorted sub-arrays.",
-        "quicksort_num": "Quick Sort: A highly efficient divide-and-conquer algorithm, using a pivot to partition the array.",
-        "quicksort_words": "Quick Sort: Sorts words efficiently using a divide-and-conquer approach with partitioning.",
-        "heap_sort_num": "Heap Sort: Uses a binary heap data structure to sort elements.",
-        "heap_sort_words": "Heap Sort: Sorts words using a binary heap.",
-        "radix_sort_num": "Radix Sort: Sorts integers by processing individual digits. Efficient for integers but not comparison-based."
+        "bubble_num": "Bubble Sort: Compares adjacent elements and swaps them if they are in the wrong order, repeatedly.",
+        "bubble_words": "Bubble Sort: Compares adjacent words and swaps them if they are in the wrong order, repeatedly.",
+        "selection_num": "Selection Sort: Repeatedly finds the minimum element from the unsorted part and places it at the beginning.",
+        "selection_words": "Selection Sort: Repeatedly finds the minimum word from the unsorted part and places it at the beginning.",
+        "insertion_num": "Insertion Sort: Builds the final sorted array one item at a time by comparisons.",
+        "insertion_words": "Insertion Sort: Builds the final sorted array of words one item at a time by comparisons.",
+        "median_num": "Median Sort (QuickSort with Median-of-Three Pivot): A divide-and-conquer algorithm using median-of-three for pivot selection to improve performance.",
+        "median_words": "Median Sort (QuickSort with Median-of-Three Pivot): Sorts words using quicksort with median-of-three pivot strategy.",
+        "merge_num": "Merge Sort: A divide-and-conquer algorithm that divides the array into halves, recursively sorts them, and then merges them.",
+        "merge_words": "Merge Sort: Sorts words using a divide-and-conquer approach, merging sorted sub-arrays.",
+        "quick_num": "Quick Sort: A highly efficient divide-and-conquer algorithm, using a pivot to partition the array.",
+        "quick_words": "Quick Sort: Sorts words efficiently using a divide-and-conquer approach with partitioning.",
+        "heap_num": "Heap Sort: Uses a binary heap data structure to sort elements.",
+        "heap_words": "Heap Sort: Sorts words using a binary heap.",
+        "radix_num": "Radix Sort: Sorts integers by processing individual digits. Efficient for integers but not comparison-based."
     }
-    description_key = algorithm_name # Use function name as key directly
+
+    # Corrected: Construct the key using just algorithm name and data_type abbreviation
+    description_key = f"{algorithm_name}_{data_type[:3]}"
+
+    description = descriptions.get(description_key, "Description not available.")
 
     if data_type == 'words':
         if method == 'length':
-            description = descriptions.get(algorithm_name, "Description not available.") + " Words are compared based on their length."
+            description += " Words are compared based on their length."
         elif method == 'lex':
-            description = descriptions.get(algorithm_name, "Description not available.") + " Words are compared lexicographically."
-        else:
-            description = descriptions.get(algorithm_name, "Description not available.") # Base description if method is somehow not specified
-    elif data_type == 'numbers':
-         description = descriptions.get(algorithm_name, "Description not available.")
-    else:
-        description = "Algorithm description not available." # Fallback
+            description += " Words are compared lexicographically."
 
-    if algorithm_name == "heap_sort_num" or algorithm_name == "heap_sort_words":
+    if "heap" in algorithm_name: # Corrected condition to check for "heap" in algorithm_name
         if count_heapify:
             description += " Includes time to build the initial heap in total execution time."
         else:
             description += " Excludes time to build the initial heap from total execution time."
+
     return description

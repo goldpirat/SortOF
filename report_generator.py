@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import os
 import fnmatch
-from pylatex import Document, Section, Subsection, Itemize, Figure, Math, TikZ, Axis, Plot, Command, Package # IMPORT Package
+from pylatex import Document, Section, Subsection, Itemize, Figure, Math, TikZ, Axis, Plot, Command, Package 
 from pylatex.utils import NoEscape, bold
 
 def generate_benchmark_plot(algorithm_name, test_case_sizes, test_case_times, output_filename='benchmark_plot.png'):

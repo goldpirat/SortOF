@@ -9,3 +9,6 @@ env/
 
 # Ignore PDF files
 *.pdf
+
+#Test Files
+main.py
