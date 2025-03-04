@@ -3,7 +3,7 @@
 [![Python Version](https://www.python.org/)](https://www.python.org/)
 [![License](https://opensource.org/licenses/MIT)](https://opensource.org/licenses/MIT)
 
-**SortOF** is a Python library designed to help you explore and benchmark the performance of various sorting algorithms **programmatically**.  It provides functions to easily benchmark sorting algorithms within your Python code and generate insightful reports.  While a basic script (`main.py`) is included for demonstration and quick tests, the primary focus is on using SortOF as a library in your own Python projects.
+**SortOF** (**Sort** **O**pen **F**ramework) is a Python library designed to help you explore and benchmark the performance of various sorting algorithms **programmatically**.  It provides functions to easily benchmark sorting algorithms within your Python code and generate insightful reports.  While a basic script (`main.py`) is included for demonstration and quick tests, the primary focus is on using SortOF as a library in your own Python projects.
 
 ## Features
 
