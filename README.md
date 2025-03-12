@@ -1,106 +1,60 @@
-# Sorting Algorithm Benchmark
+# SortOF (Sorting Open Framework)
 
-This Python script benchmarks the performance of various sorting algorithms and generates a PDF report summarizing the results. It supports benchmarking with different data types (numbers and words) and allows you to generate performance plots and detailed reports in PDF format using LaTeX.
+**A Python library for benchmarking sorting algorithms across different data types.**
 
-## Features
+## What is SortOF?
 
-*   **Benchmarks Multiple Sorting Algorithms:** Includes implementations of Bubble Sort, Insertion Sort, Selection Sort, Median Sort (QuickSort with median-of-three pivot), Merge Sort, Quick Sort (random pivot), Heap Sort, and Radix Sort (for numbers only).
-*   **Data Type Flexibility:**  Benchmarks can be run on arrays of numbers or words. For word sorting, you can choose to sort by word length or lexicographically.
-*   **Performance Plotting:** Generates benchmark plots showing execution time versus input size for each algorithm using Matplotlib.
-*   **PDF Reporting:** Creates comprehensive PDF reports (using LaTeX) that include:
-    *   Algorithm descriptions
-    *   General performance metrics (average execution time)
-    *   Input details (data type, array size, test cases)
-    *   Benchmark plots
-*   **Customizable Test Cases:** Allows you to specify custom test case sizes via command-line arguments.
+SortOF is a lightweight Python library and **API (Application Programming Interface)** designed for benchmarking the performance of various sorting algorithms. It empowers you to easily compare the execution time of different algorithms when sorting various data types in your Python projects:
 
-## Requirements
+*   **Numbers:**  Benchmark standard sorting algorithms on numerical arrays.
+*   **Words:**  Benchmark sorting algorithms on lists of words, with options for sorting by length or lexicographically (alphabetical order).
+*   **Matrices:** Benchmark sorting algorithms on lists of matrices, ordering them based on matrix properties like determinant, trace, or Frobenius norm.
 
-*   **Python 3.x**
-*   **LaTeX Installation:**  To generate PDF reports, you need to have a LaTeX distribution installed on your system (e.g., TeX Live, MiKTeX).
-*   **Python Packages:**  Install the necessary Python packages using `pip`:
+SortOF provides as a **library/API**:
+
+*   **Collection of Sorting Algorithms:** Includes implementations of Bubble Sort, Insertion Sort, Selection Sort, Merge Sort, Quick Sort, Heap Sort, Median Sort, and Radix Sort.
+*   **Benchmarking Functionality:**  Provides a simple `benchmark()` function to measure the average execution time of sorting algorithms across different test case sizes.
+*   **Result Visualization:** Generates PNG plots of benchmark results to visually compare performance.
+*   **Detailed Reporting:** Creates PDF reports summarizing benchmark findings, including algorithm descriptions, input details, and performance charts for documentation or sharing.
+*   **Showcase Example (`main.py`):**  Offers a clear and practical example of how to integrate and use the SortOF library/API in your own Python code.
+
+## Key Accomplishments:
+
+*   **Versatile Data Type Support:**  Supports benchmarking for numbers, words, and matrices, making it adaptable to different sorting needs.
+*   **Matrix Sorting Capabilities:** Enables sorting of matrices based on key linear algebra metrics (determinant, trace, norm).
+*   **Streamlined Benchmarking API:** Simplifies the benchmarking process through the `stf.benchmark()` function.
+*   **Comprehensive Reporting API:** Offers automated generation of both visual plots and detailed PDF reports for analysis and documentation.
+*   **Modular Library Design:** Built as a reusable Python library (`sortof.py`) with a clear API for integration into other projects, alongside a demonstrative showcase script (`main.py`).
+
+## How to Use (as a Library/API):
+
+1.  **Install Dependencies:** Ensure `numpy`, `matplotlib`, and `reportlab` are installed:
     ```bash
-    pip install -r requirements.txt
+    pip install numpy matplotlib reportlab
     ```
-    See the `requirements.txt` file for the list of packages.
-
-## How to Use
-
-1.  **Clone the repository** (if you haven't already).
-2.  **Install Python package dependencies:**
-    ```bash
-    pip install -r requirements.txt
+2.  **Import SortOF in your Python Project:**
+    ```python
+    import sortof as stf  # Import SortOF and alias it as 'stf'
     ```
-3.  **Run `main.py`** with the desired arguments.
+3.  **Use the `stf.benchmark()` function:** Call `stf.benchmark()` in your code to benchmark sorting algorithms.  Refer to the `main.py` example for detailed usage:
 
-    **Basic Command:**
+    ```python
+    import sortof as stf
 
-    ```bash
-    python3 main.py
-    ```
+    algorithms_to_test = ["bubble", "insertion"]
+    test_sizes = [100, 1000]
+    generate_reports = True
 
-    This will run benchmarks for all sorting algorithms on number arrays using default test case sizes and will **not** generate a PDF report.
-
-    **Generating PDF Reports:**
-
-    To generate a PDF report for the benchmark, use the `--pdf` flag:
-
-    ```bash
-    python3 main.py --pdf
-    ```
-
-    This will generate PDF reports for all algorithms benchmarked.
-
-    **Specifying Algorithms:**
-
-    To benchmark specific algorithms (instead of all), use the `--algorithm` argument followed by the algorithm name. You can choose from: `bubble_sort`, `insertion_sort`, `selection_sort`, `median_sort`, `merge_sort`, `quick_sort`, `heap_sort`, `radix_sort` or `all` for all algorithms.
-
-    ```bash
-    python3 main.py --algorithm "Merge Sort" --pdf
-    python3 main.py --algorithm quick_sort --pdf
-    python3 main.py --algorithm all --pdf
+    for algo in algorithms_to_test:
+        stf.benchmark(algorithm=algo, data_type='numbers', test_case_sizes=test_sizes, pdf_report=generate_reports)
     ```
 
-    **Specifying Data Type:**
+4.  **Run your Python script.**
+5.  **Find Reports:** Benchmark plots (PNG) and PDF reports will be generated in the `reports` subdirectory.
 
-    Use the `--data_type` argument to specify the data type for sorting. Choose between `numbers` (default) and `strings`.
+**Run the Showcase Example:**
 
-    ```bash
-    python3 main.py --data_type numbers --pdf
-    python3 main.py --data_type strings --pdf
-    ```
+To quickly see SortOF in action, you can run the provided `main.py` showcase script:
 
-    **Custom Test Case Sizes:**
-
-    Use the `--test_sizes` argument followed by a space-separated list of integer sizes to define custom test cases.
-
-    ```bash
-    python3 main.py --test_sizes 100 500 1000 --pdf
-    python3 main.py --test_sizes 5000 10000 --algorithm "Quick Sort" --pdf
-    ```
-
-    **Example Command to run all algorithms on numbers and generate PDF reports with custom test sizes:**
-
-    ```bash
-    python3 main.py --algorithm all --data_type numbers --pdf --test_sizes 100 1000 10000
-    ```
-
-    **Word Sorting Options (for `strings` data type):**
-
-    When using `--data_type strings`, the script defaults to sorting words lexicographically.  Word length sorting is not implemented in this version.
-
-## Script Files
-
-*   `main.py`:  The main script to run benchmarks and generate reports.
-*   `sorting_algorithms.py`:  Contains implementations of various sorting algorithms for numbers and words.
-*   `report_generator.py`:  Handles the generation of benchmark plots and PDF reports using LaTeX (`pylatex`).
-*   `default_config.py`:  Configuration file (e.g., default test case sizes, algorithm list).
-*   `requirements.txt`:  Lists Python package dependencies.
-*   `README.md`: This file, providing documentation for the project.
-
-## Notes
-
-*   Ensure you have LaTeX properly installed and configured for PDF report generation.
-*   Benchmark results can vary based on your system's hardware and software environment.
-*   The `Radix Sort` algorithm is only implemented for number arrays in this version.
-*   Word sorting for `strings` data type is currently only implemented for lexicographical sorting.
+```bash
+python3 main.py
